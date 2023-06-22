@@ -2,6 +2,8 @@
 ## What is it
 This is a test task I did for someone. It displays a text field you can enter a math expression, and it will show the result spotlight-style.
 
+[Live Demo](https://lively-sprinkles-ce7d48.netlify.app/)
+
 ## How it works
 JS searches for the elements with class ‘yas-component’ and adds to their content markup required for the calculator to function.
 
@@ -14,7 +16,7 @@ Preformatted numbers like 1,000.42, 1.000,42, or 1 000,42 will be parsed accordi
 2. Adapt the virtual keyboard for mobiles and use it instead of a native keyboard.
 3. Use of a virtual keyboard does not move the cursor outside the text field.
 4. Virtual keyboard enters symbols at the cursor and not just at the end.
-5. 3. Keyboard Icon instead of text.
+5. Keyboard Icon instead of text.
 6. Move most css values to css variables and create some themes.
 
 
