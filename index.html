@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Yet Another Calculator</title>
     <style>
+      html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
       body {
         background: #000;
         display: flex;
@@ -13,35 +20,60 @@
         height: 100vh;
         font-family: sans-serif;
         box-sizing: border-box;
+        padding: 1rem;
       }
 
       .yac-component {
         position: relative;
         display: inline-block;
+        
         font-family: Menlo, monospace;
         color: lightgreen;
+        max-width: 100%;
       }
 
       .yac-input {
-        font-size: 2rem;
+        max-width: 100%;
+        font-size: 1.5rem;
         font-family: inherit;
         color: inherit;
         padding: 1rem;
         border: 1px solid green;
         border-radius: 0;
-        outline-offset: .2rem ;
         outline: none;
-
         background: black;
-        
       }
-
+      
       .yac-input:focus {
         border-color: greenyellow;
       }
 
       .yac-input::placeholder {
         color: darkolivegreen;
+      }
+
+      .yac-keyboard-button {
+        display: none
+      }
+
+      .yac-component button {
+        font-family: inherit;
+        padding: 1.5rem;
+        border: 1px solid green;
+        background-color: black;
+        color: inherit;
+        border-radius: 0;
+        font-size: 1.5rem;
+        outline: none;
+        box-shadow: .2rem .2rem 0 0 darkgreen;
+      }
+
+      .yac-component button:focus {
+        border-color: greenyellow;
+      }
+
+      .yac-component button:active {
+        box-shadow: .1rem .1rem 0 0 darkgreen;
       }
 
       .yac-result {
@@ -70,9 +102,9 @@
         transform: rotate(135deg) translateX(50%);
         position: absolute;
         left: 10px;
-        bottom: -3px;
-        
+        bottom: -3px; 
       }
+
       .yac-result::after{
         border-top-color: black;
         border-right-color: black;
@@ -85,67 +117,81 @@
       }
 
       .yac-keyboard {
-        position: absolute;
-        left:50%;
-        top: 100%;
-        transform: translate(-50%, 1rem);   
-        display: flex;
-        gap: 1rem;
-        max-width: 100vw;
-        min-width: 46rem;
-        background: black;
-        padding: 1rem;
-        border: 1px solid green;
-        box-shadow: 1rem 1rem 0 0 darkgreen;
-        border-radius: 0;
-      }
 
-      .yac-component button {
-        font-family: inherit;
-        padding: 1rem;
-        border: 1px solid green;
-        background-color: black;
-        color: inherit;
-        border-radius: 0;
-        font-size:2rem;
-        outline: none;
-        box-shadow: .2rem .2rem 0 0 darkgreen;
-      }
-
-      .yac-component button:focus {
-        border-color: greenyellow;
-      }
-
-      .yac-component button:active {
-        box-shadow: .1rem .1rem 0 0 darkgreen;
       }
 
       .yac-keyboard-keys {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: start;
-        gap: 1rem;
-        margin:0;
-        padding: 0;
-        flex-direction: row-reverse;
-      }
-      
-      .yac-keyboard-keys button {
-        flex: 0 0 calc(33% - 0.66rem);
+        display: none
       }
 
       .yac-keyboard-ops {
-        width: 25%;
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        margin:0;
-        padding: 0;
+        gap:1rem;
+        padding:1rem 0;
       }
 
-      .yac-keyboard-ops button{
-        flex: 0 0 calc(50% - 1rem);
+      @media (min-width: 768px) {
+        .yac-component {
+          display: inline-flex;
+        }
+
+        .yac-input {
+          font-size: 2rem;
+        }
+
+        .yac-keyboard-button {
+          display: inline-block;
+        }        
+
+        .yac-keyboard {
+          position: absolute;
+          left:50%;
+          top: 100%;
+          transform: translate(-50%, 1rem);   
+          display: flex;
+          gap: 1rem;
+          max-width: 100vw;
+          min-width: 46rem;
+          background: black;
+          padding: 1rem;
+          border: 1px solid green;
+          box-shadow: 1rem 1rem 0 0 darkgreen;
+          border-radius: 0;
+        }
+
+        .yac-hidden {
+          display: none;
+        }
+
+        .yac-keyboard-keys {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: start;
+          gap: 1rem;
+          margin:0;
+          padding: 0;
+          flex-direction: row-reverse;
+        }
+        
+        .yac-keyboard-keys button {
+          flex: 0 0 calc(33% - 0.66rem);
+        }
+
+        .yac-keyboard-ops {
+          width: 25%;
+          flex-shrink: 0;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 1rem;
+          margin:0;
+          padding: 0;
+        } 
+        .yac-keyboard-ops button{
+          flex: 0 0 calc(50% - 1rem);
+        }
+
       }
 
     </style>
@@ -173,6 +219,11 @@
           input.setAttribute('type', 'text');
           input.setAttribute('placeholder', 'Ex: 2+2-3^2');
           input.setAttribute('autocomplete', 'off');
+          input.setAttribute('autocorrect', 'off');
+          input.setAttribute('autocapitalize', 'off');
+          input.setAttribute('spellcheck', 'false');
+          input.setAttribute('inputmode', 'decimal');
+
           input.addEventListener('keyup', handle_change);
           input.addEventListener('input', handle_change);
 
@@ -182,11 +233,10 @@
           const keyboard_button = document.createElement('button');
           keyboard_button.textContent = 'Show Keyboard';
           keyboard_button.classList.add('yac-keyboard-button');
-          keyboard_button.addEventListener('click', keyboard_show);
+          keyboard_button.addEventListener('click', handle_keyboard_show);
 
           const keyboard = document.createElement('div');
-          keyboard.classList.add('yac-keyboard');
-          keyboard.style.display = 'none';
+          keyboard.classList.add('yac-keyboard', 'yac-hidden');
           keyboard.innerHTML = `
             <div class="yac-keyboard-keys">
               <button data-value="9">9</button>
@@ -250,6 +300,25 @@
         }
 
         /**
+         * Shows virtual keyboard
+         * @param {MouseEvent} e
+         * @returns {void}
+         */
+         function handle_keyboard_show(e) {
+          /** @type {HTMLElement} */
+          const keyboard = e.target.closest('.yac-component').querySelector('.yac-keyboard');
+          if (!keyboard) return;
+
+          keyboard.classList.remove('yac-hidden');
+          
+          document.addEventListener('click', function keyboard_hide(e) {
+            if (e.target.closest('.yac-component')) return;
+            keyboard.classList.add('yac-hidden');
+            document.removeEventListener('click', keyboard_hide);
+          });
+        }
+
+        /**
          * Handles click on virtual keyboard button
          * @param {MouseEvent} e
          * @returns {void}
@@ -258,7 +327,7 @@
             const button = e.target;
             const value = button.dataset.value;
             const input = button.closest('.yac-component').querySelector('.yac-input');
-
+            input.focus();
             if (value === 'c') {
               input.value = '';
               input.dispatchEvent(new Event('keyup'));
@@ -266,6 +335,7 @@
             }
 
             input.value += value;
+            
             input.dispatchEvent(new Event('keyup'));
           }
 
@@ -303,25 +373,6 @@
           });
 
           return ret;
-        }
-
-        /**
-         * Creates or shows virtual keyboard
-         * @param {MouseEvent} e
-         * @returns {void}
-         */
-        function keyboard_show(e) {
-          let keyboard = e.target.closest('.yac-component').querySelector('.yac-keyboard');
-          if (!keyboard) return;
-          
-          document.addEventListener('click', function keyboard_hide(e) {
-            if (e.target.closest('.yac-component')) return;
-            if (keyboard.style.display === 'none') return;
-            keyboard.style.display = 'none';
-            document.removeEventListener('click', keyboard_hide);
-          });
-
-          keyboard.removeAttribute('style');
         }
 
         let components = document.querySelectorAll('.yac-component');
