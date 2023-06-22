@@ -11,6 +11,8 @@ It takes text from the input, sanitizes, normalizes, and passes it to the `eval(
 
 Preformatted numbers like 1,000.42, 1.000,42, or 1 000,42 will be parsed according to browser locale.
 
+All the code you might be interested is in the `index.html`
+
 ## What can be improved, but if I had more time
 1. Deal with numbers that are too large.
 2. Adapt the virtual keyboard for mobiles and use it instead of a native keyboard.
