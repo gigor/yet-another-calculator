@@ -65,6 +65,7 @@
         border-radius: 0;
         font-size: 1.5rem;
         outline: none;
+        white-space: nowrap;
         box-shadow: .2rem .2rem 0 0 darkgreen;
       }
 
@@ -353,25 +354,31 @@
          * Normalizes the input text to be used in eval
          * Replaces ^ with **
          * Removes spaces
-         * Converts numbers with comma or dot to number according to the browser locale
+         * Converts numbers with commas or period to numbers with period for decimal separator
+         * 
          * @param {string} text
          * @returns {string}
          */
         function normalize_input(text) {
           let ret = text;
-          
-          if (allowed_chars.includes('^')) ret = ret.replace('^', '**');
-          if (allowed_chars.includes(' ')) ret = ret.replace(' ', '');
+        
+          ret = ret.replace(' ', '');
 
-          let example_number = Intl.NumberFormat().format(1234.56);
-          let thousands_separator = Number(example_number[1]) ? '': example_number[1];
-          let decimal_separator = example_number[5];
+          // Breaks string into parts: '(1,234.56+1.234.567,89)' => ['(','1,234.56','+','1.234.567,89',')']
+          let matches = ret.match(/(\*|\/|\^|\+|\-|\(|\))|(\d+|\,|\.)+/g);
 
-          let matches = text.match(/(\d+)(\,|\.)?(\d+)?/g);
-          if (matches) matches.forEach((match) => {
-            ret = ret.replace(match, match.replace(decimal_separator, '.').replace(thousands_separator, ''));
+          matches = matches?.map((match) => {
+            // If it's a number, normilize it
+            if (/\d/.test(match.charAt(0))) {
+              let number_parts = match.split(/(\,|\.)/g);
+              let decimal_part = number_parts.length > 1 ? number_parts.pop() : '00';
+              return `${number_parts.join('').replace(/(\,|\.)/g, '')}.${decimal_part}`;  
+            }
+            return match;
           });
 
+          ret = matches?.join('') || ret;
+          ret = ret.replace('^', '**');
           return ret;
         }
 
